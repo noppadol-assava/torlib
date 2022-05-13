@@ -3,18 +3,22 @@ widget: featurette
 headless: true
 weight: 20
 title: Features
-subtitle: Document _anything_ ✨
+# subtitle: Current version of package support followings features
 feature:
-  - icon: book-open
+  - icon: 
+    icon_pack: 
+    name:
+    description:
+  - icon: spider
     icon_pack: fas
-    name: Project Documentation
-    description: For users
-  - icon: question
-    icon_pack: fas
-    name: Knowledge Base
-    description: For teams
-  - icon: list-alt
-    icon_pack: fas
-    name: Personal Notebook
-    description: For yourself
+    name: Data Crawling
+    description: Crawl data from Github API easily
+  # - icon: question
+  #   icon_pack: fas
+  #   name: Knowledge Base
+  #   description: For teams
+  # - icon: list-alt
+  #   icon_pack: fas
+  #   name: Personal Notebook
+  #   description: For yourself
 ---

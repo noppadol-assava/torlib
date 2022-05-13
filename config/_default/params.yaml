@@ -6,9 +6,9 @@
 # Appearance
 
 appearance:
-  theme_day: minimal
-  theme_night: minimal
-  font: minimal
+  theme_day: Forest
+  theme_night: Forest
+  font: native
   font_size: L
 
 # SEO
@@ -18,8 +18,8 @@ marketing:
     site_type: Project
     local_business_type: ''
     org_name: ''
-    description: 'A highly-customizable Hugo documentation theme powered by Wowchemy website builder.'
-    twitter: 'wowchemy'
+    description: ''
+    twitter: ''
   analytics:
     google_analytics: ''
     baidu_tongji: ''
@@ -67,9 +67,9 @@ features:
   privacy_pack:
     enable: false
   repository:
-    url: 'https://github.com/wowchemy/hugo-documentation-theme'
+    url: 'https://github.com/noppadol-assava/torlib'
     content_dir: content
-    branch: main
+    branch: documentation
   comment:
     provider: ''
     disqus:

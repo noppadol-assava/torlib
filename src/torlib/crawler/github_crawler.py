@@ -84,7 +84,7 @@ def githubcrawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='git
         count_try = count_try+1
         # create pool for multiprocessing
         with mp.Pool(pc) as p:
-            multi_out = tqdm(p.imap(collect_json_multipage,
+            multi_out = tqdm(p.imap(__collect_json_multipage,
                                     list_to_crawl, chunksize=1), total=len(list_to_crawl))
             result = [i for i in multi_out]
         # check if all of url is complete and list only fail url
@@ -103,7 +103,7 @@ def githubcrawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='git
         json.dump(fail_list, outfile)
 
 
-def collect_json_multipage(input_tuple):
+def __collect_json_multipage(input_tuple):
     """ save response from request as json file
 
     Args:

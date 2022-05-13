@@ -7,12 +7,22 @@ import json
 from pathlib import Path
 
 
-class Error(Exception):
-    """ Base class for exception"""
-    pass
+class NoTokenError(Exception):
+    """Raised when input list of github token is empty
+
+    Attributes:
+        message (string): explanation of the error
+    """
+
+    def __init__(self, message="please input github token"):
+        super().__init__(self.message)
+        self.message = message
+
+    def __str__(self):
+        return f'{self.message}'
 
 
-class LengthNotMatchError(Error):
+class LengthNotMatchError(Exception):
     """Raised when the length of savename and url is not the same
 
     Attributes:
@@ -22,16 +32,16 @@ class LengthNotMatchError(Error):
     """
 
     def __init__(self, savename, url, message="savename and url must have same length"):
+        super().__init__(self.message)
         self.length_savename = len(savename)
         self.length_url = len(url)
         self.message = message
-        super().__init__(self.message)
 
     def __str__(self):
         return f'len(savename)={self.length_savename} len(url)={self.length_url}-> {self.message}'
 
 
-class InputNotStringError(Error):
+class InputNotStringError(Exception):
     """Raised when not all of member in savename or url are string
 
     Attributes:
@@ -40,9 +50,9 @@ class InputNotStringError(Error):
     """
 
     def __init__(self, error_list_name, message=" must contain only string"):
+        super().__init__(self.message)
         self.error_list_name = error_list_name
         self.message = message
-        super().__init__(self.message)
 
     def __str__(self):
         return f'{self.error_list_name} {self.message}'
@@ -70,6 +80,12 @@ def githubcrawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='git
     for i in url:
         if type(i) != str:
             raise InputNotStringError('url')
+    # check if github token is empty
+    if len(GHtoken) == 0:
+        raise NoTokenError()
+    # if savename and url length is 0 do nothing
+    if len(savename) == 0 and len(url) == 0:
+        return
     # create path to output_dir if not exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     # prepared parameter for collect_json_multipage

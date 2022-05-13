@@ -5,7 +5,7 @@ import time
 import requests
 import json
 from pathlib import Path
-
+import responses
 
 class NoTokenError(Exception):
     """Raised when input list of github token is empty
@@ -58,7 +58,7 @@ class InputNotStringError(Exception):
         return f'{self.error_list_name} -> {self.message}'
 
 
-def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='github_crawler_log.txt', output_dir=''):
+def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='github_crawler_log.txt', output_dir='', for_test=False):
     """ crawl the github api and save file to json this function will also generate the log file that show the url of api that cannot be crawled
 
     Args:
@@ -69,6 +69,7 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
         pc (int, optional): number of process for multiprocessing. Defaults to 1.
         log_file (str, optional): name of the log file showing the detail of fail case. Defaults to 'github_crawler_log.txt'.
         output_dir (str, optional): output directory. Defaults to ''.
+        for_test (boolean, optional): used for testing or not. Defaults to False.
     """
     # check the size of savename and url
     if len(savename) != len(url):
@@ -100,7 +101,7 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
         count_try = count_try+1
         # create pool for multiprocessing
         with mp.Pool(pc) as p:
-            multi_out = tqdm(p.imap(__collect_json_multipage,
+            multi_out = tqdm(p.imap(__collect_json_multipage if not for_test else __collect_json_multipage_for_testing,
                                     list_to_crawl, chunksize=1), total=len(list_to_crawl))
             result = [i for i in multi_out]
         # check if all of url is complete and list only fail url
@@ -119,7 +120,7 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
     with open(log_file, 'w') as outfile:
         json.dump(fail_list, outfile)
 
-
+        
 def __collect_json_multipage(input_tuple):
     """ save response from request as json file
 
@@ -173,3 +174,27 @@ def __collect_json_multipage(input_tuple):
     except Exception as e:
         return (url, str(e))
     return (url, 1)
+
+
+@responses.activate
+def __collect_json_multipage_for_testing(input_tuple):
+    """ function used for testing only"""
+    responses.add(responses.GET,
+                  'http://test_github/api/1?per_page=100&page=1',
+                  status=200,
+                  content_type='application/json',
+                  headers={'X-RateLimit-Remaining': '100000'},
+                  body='{"test": "test1"}')
+    responses.add(responses.GET,
+                  'http://test_github/api/2?per_page=100&page=1',
+                  status=200,
+                  content_type='application/json',
+                  headers={'X-RateLimit-Remaining': '100000'},
+                  body='{"test": "test2"}')
+    responses.add(responses.GET,
+                  'http://test_github/api/3?per_page=100&page=1',
+                  status=200,
+                  content_type='application/json',
+                  headers={'X-RateLimit-Remaining': '100000'},
+                  body='{"test": "test3"}')
+    return __collect_json_multipage(input_tuple)

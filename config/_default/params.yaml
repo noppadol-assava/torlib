@@ -66,10 +66,10 @@ features:
     enable: false
   privacy_pack:
     enable: false
-  repository:
-    url: 'https://github.com/noppadol-assava/torlib'
-    content_dir: content
-    branch: documentation
+  # repository:
+  #   url: 'https://github.com/noppadol-assava/torlib'
+  #   content_dir: content
+  #   branch: documentation
   comment:
     provider: ''
     disqus:

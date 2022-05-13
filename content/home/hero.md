@@ -3,15 +3,15 @@ widget: hero
 headless: true
 weight: 10
 title: torlib documentation
-# hero_media: book.svg
+hero_media: icon.png
 # design:
 #   background:
 #     gradient_start: '#4bb4e3'
 #     gradient_end: '#2b94c3'
 #     text_color_light: true
 cta:
-  url: docs/
-  label: Get Started
+  url: docs/gettingstarted/
+  label: Geting started
   icon_pack: fas
   icon: download
 # cta_alt:

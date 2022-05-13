@@ -12,7 +12,7 @@ class Error(Exception):
     pass
 
 
-class LengthNotMatch(Error):
+class LengthNotMatchError(Error):
     """Raised when the length of savename and url is not the same
 
     Attributes:
@@ -31,7 +31,7 @@ class LengthNotMatch(Error):
         return f'len(savename)={self.length_savename} len(url)={self.length_url}-> {self.message}'
 
 
-class InputNotString(Error):
+class InputNotStringError(Error):
     """Raised when not all of member in savename or url are string
 
     Attributes:
@@ -62,14 +62,14 @@ def githubcrawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='git
     """
     # check the size of savename and url
     if len(savename) != len(url):
-        raise LengthNotMatch(savename, url)
+        raise LengthNotMatchError(savename, url)
     # check type of member of savename and url
     for i in savename:
         if type(i) != str:
-            raise InputNotString('savename')
+            raise InputNotStringError('savename')
     for i in url:
         if type(i) != str:
-            raise InputNotString('url')
+            raise InputNotStringError('url')
     # create path to output_dir if not exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)
     # prepared parameter for collect_json_multipage

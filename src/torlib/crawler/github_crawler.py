@@ -15,8 +15,8 @@ class NoTokenError(Exception):
     """
 
     def __init__(self, message="please input github token"):
-        super().__init__(self.message)
         self.message = message
+        super().__init__(self.message)
 
     def __str__(self):
         return f'{self.message}'
@@ -32,13 +32,13 @@ class LengthNotMatchError(Exception):
     """
 
     def __init__(self, savename, url, message="savename and url must have same length"):
-        super().__init__(self.message)
         self.length_savename = len(savename)
         self.length_url = len(url)
         self.message = message
+        super().__init__(self.message)
 
     def __str__(self):
-        return f'len(savename)={self.length_savename} len(url)={self.length_url}-> {self.message}'
+        return f'len(savename)={self.length_savename} len(url)={self.length_url} -> {self.message}'
 
 
 class InputNotStringError(Exception):
@@ -49,26 +49,26 @@ class InputNotStringError(Exception):
         message (string): explanation of the error
     """
 
-    def __init__(self, error_list_name, message=" must contain only string"):
-        super().__init__(self.message)
+    def __init__(self, error_list_name, message="savename or url must contain only string"):
         self.error_list_name = error_list_name
         self.message = message
+        super().__init__(self.message)
 
     def __str__(self):
-        return f'{self.error_list_name} {self.message}'
+        return f'{self.error_list_name} -> {self.message}'
 
 
-def githubcrawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='github_crawler_log.txt', output_dir=''):
+def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='github_crawler_log.txt', output_dir=''):
     """ crawl the github api and save file to json this function will also generate the log file that show the url of api that cannot be crawled
 
     Args:
         savename (list): contain string of the save file name (need to be same length as url)
         url (list): contain string of url of the target api (need to be same length as savename)
-        GHtoken (_type_): _description_
-        retry (int, optional): _description_. Defaults to 3.
-        pc (int, optional): _description_. Defaults to 1.
-        log_file (str, optional): _description_. Defaults to 'github_crawler_log.txt'.
-        output_dir (str, optional): _description_. Defaults to ''.
+        GHtoken (list): list of github token
+        retry (int, optional): number of time to retry crawling the fail case. Defaults to 3.
+        pc (int, optional): number of process for multiprocessing. Defaults to 1.
+        log_file (str, optional): name of the log file showing the detail of fail case. Defaults to 'github_crawler_log.txt'.
+        output_dir (str, optional): output directory. Defaults to ''.
     """
     # check the size of savename and url
     if len(savename) != len(url):
@@ -110,11 +110,12 @@ def githubcrawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='git
             url, is_success = result[i]
             if is_success != 1:
                 complete = False
-                remain_list_to_crawl.append(result[i])
+                remain_list_to_crawl.append(list_to_crawl[i])
         list_to_crawl = remain_list_to_crawl
+        print(list_to_crawl)
     # list url that cannot be crawled
-    fail_list = [(url, is_success != 1)
-                 for url, is_success in result if is_success]
+    fail_list = [(url, is_success)
+                 for url, is_success in result if is_success != 1]
     with open(log_file, 'w') as outfile:
         json.dump(fail_list, outfile)
 

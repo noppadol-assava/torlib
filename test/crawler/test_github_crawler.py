@@ -4,7 +4,6 @@ import os
 import src.torlib.crawler.github_crawler as gc
 from src.torlib.crawler.github_crawler import NoTokenError, LengthNotMatchError, InputNotStringError
 import responses
-import requests
 
 
 def test_github_crawler_multipage_notoken():

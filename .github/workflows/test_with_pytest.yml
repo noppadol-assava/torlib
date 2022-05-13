@@ -1,5 +1,9 @@
 name: Tests
 on:
+  push:
+    branches-ignore:
+      - documentation_publish
+      - documentation
   pull_request:
     branches:
       - master

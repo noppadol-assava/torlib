@@ -19,7 +19,7 @@ set -x
 apt-get update
 apt-get -y install git rsync python3-sphinx python3-sphinx-rtd-theme python3-stemmer python3-git python3-pip python3-virtualenv python3-setuptools
  
-python3 -m pip install --upgrade rinohtype pygments
+python3 -m pip install --upgrade rinohtype pygments requests
 python3 -m pip install .
 #####################
 # DECLARE VARIABLES #
@@ -48,7 +48,12 @@ for current_version in ${versions}; do
    # make the current language available to conf.py
    export current_version
    git checkout ${current_version}
- 
+
+   # rename "master" to "stable"
+	if [[ "${current_version}" == "master" ]]; then
+		current_version="stable"
+	fi
+   
    echo "INFO: Building sites for ${current_version}"
  
    # skip this branch if it doesn't have our docs dir & sphinx config

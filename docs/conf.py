@@ -230,18 +230,28 @@ html_context['current_version'] = current_version
 html_context['version'] = current_version
  
 # POPULATE LINKS TO OTHER LANGUAGES
-# html_context['languages'] = [ ('en', '/' +REPO_NAME+ '/en/' +current_version+ '/') ]
+html_context['languages'] = [ ('en', '/' +REPO_NAME+ '/en/' +current_version+ '/') ]
  
 # languages = [lang.name for lang in os.scandir('locales') if lang.is_dir()]
+# languages = ['lang.name for lang in os.scandir('locales') if lang.is_dir()']
+
 # for lang in languages:
 #    html_context['languages'].append( (lang, '/' +REPO_NAME+ '/' +lang+ '/' +current_version+ '/') )
  
 # POPULATE LINKS TO OTHER VERSIONS
 html_context['versions'] = list()
-exclude_branches = ['documentation_hugo_old', 'documentation_publish_hugo_old']
-versions = [branch.name for branch in repo.branches if branch.name not in exclude_branches]
+exclude_branches = set(['documentation_hugo_old', 'documentation_publish_hugo_old', 'HEAD', 'gh-pages'])
+remote_refs = repo.remote().refs
+versions = list()
+for ref in remote_refs:
+	ref = ref.name.split('/')[-1]
+	if ref not in exclude_branches:
+		versions.append( ref )
+# versions = [branch.name for branch in repo.branches if branch.name not in exclude_branches]
 for version in versions:
-   html_context['versions'].append( (version, '/' +REPO_NAME+ '/'  +current_language+ '/' +version+ '/') )
+   if version == 'master':
+      version = 'stable'
+      html_context['versions'].append( (version, '/' +REPO_NAME+ '/'  +current_language+ '/' +version+ '/') )
  
 # POPULATE LINKS TO OTHER FORMATS/DOWNLOADS
  

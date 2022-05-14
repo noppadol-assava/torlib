@@ -25,6 +25,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TORLIB_SECRET }}
       run: |
-        chmod +x docs/buildDocs.sh
-        docs/buildDocs.sh
+        sh docs/buildDocs.sh
       shell: bash

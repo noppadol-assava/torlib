@@ -49,11 +49,6 @@ for current_version in ${versions}; do
    export current_version
    git checkout ${current_version}
 
-   # rename "master" to "stable"
-	if [[ "${current_version}" == "master" ]]; then
-		current_version="stable"
-	fi
-   
    echo "INFO: Building sites for ${current_version}"
  
    # skip this branch if it doesn't have our docs dir & sphinx config

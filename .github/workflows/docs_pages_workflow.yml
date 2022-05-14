@@ -20,7 +20,7 @@ jobs:
         apt-get install -y git
         git clone "https://token:${TORLIB_SECRET}@github.com/${GITHUB_REPOSITORY}.git" .
         git checkout v0.0.4_documentation
-        apt-get install python3-pip
+        apt-get install -y python3-pip
         pip3 install .
       shell: bash
  

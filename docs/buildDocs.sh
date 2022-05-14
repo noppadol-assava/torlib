@@ -74,12 +74,12 @@ for current_version in ${versions}; do
       # PDF #
       sphinx-build -b rinoh docs/ docs/_build/rinoh -D language="${current_language}"
       mkdir -p "${docroot}/${current_language}/${current_version}"
-      cp "docs/_build/rinoh/target.pdf" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.pdf"
+      cp "docs/_build/rinoh/target.pdf" "${docroot}/${current_language}/${current_version}/torlib-docs_${current_language}_${current_version}.pdf"
  
       # EPUB #
       sphinx-build -b epub docs/ docs/_build/epub -D language="${current_language}"
       mkdir -p "${docroot}/${current_language}/${current_version}"
-      cp "docs/_build/epub/target.epub" "${docroot}/${current_language}/${current_version}/helloWorld-docs_${current_language}_${current_version}.epub"
+      cp "docs/_build/epub/target.epub" "${docroot}/${current_language}/${current_version}/torlib-docs_${current_language}_${current_version}.epub"
  
       # copy the static assets produced by the above build into our docroot
       rsync -av "docs/_build/html/" "${docroot}/"
@@ -98,7 +98,7 @@ git checkout master
 git config --global user.name "${GITHUB_ACTOR}"
 git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
  
-pushd "${docroot}"
+cd "${docroot}"
  
 # don't bother maintaining history; just generate fresh
 git init

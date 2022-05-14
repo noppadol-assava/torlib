@@ -242,6 +242,7 @@ html_context['languages'] = [ ('en', '/' +REPO_NAME+ '/en/' +current_version+ '/
 html_context['versions'] = list()
 exclude_branches = set(['documentation_hugo_old', 'documentation_publish_hugo_old'])
 versions = [branch.name for branch in repo.branches if branch.name not in exclude_branches]
+print('*'*100, str(versions), repo.branches)
 for version in versions:
       html_context['versions'].append( (version, '/' +REPO_NAME+ '/'  +current_language+ '/' +version+ '/') )
  

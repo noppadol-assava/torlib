@@ -16,11 +16,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.TORLIB_SECRET }}
       run: |
-        git checkout v0.0.4_documentation
-        pip3 install .
         apt-get update
         apt-get install -y git
         git clone "https://token:${TORLIB_SECRET}@github.com/${GITHUB_REPOSITORY}.git" .
+        git checkout v0.0.4_documentation
+        pip3 install .
       shell: bash
  
     - name: Execute script to build our documentation and update pages

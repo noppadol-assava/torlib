@@ -26,7 +26,7 @@ author = 'Noppadol Assavakamhaenghan'
 # The short X.Y version
 # import torlib
 # version = torlib.__version__
-version = 'v0.0.4'
+version = 'v0.0.5'
 # The full version, including alpha/beta/rc tags
 release = version
 

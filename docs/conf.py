@@ -24,7 +24,8 @@ copyright = '2022, Noppadol Assavakamhaenghan'
 author = 'Noppadol Assavakamhaenghan'
 
 # The short X.Y version
-version = 'v0.0.4'
+import torlib
+version = torlib.__version__
 # The full version, including alpha/beta/rc tags
 release = version
 

@@ -243,7 +243,9 @@ html_context['versions'] = list()
 exclude_branches = ['documentation_hugo_old', 'documentation_publish_hugo_old']
 versions = [branch.name for branch in repo.branches if branch.name not in exclude_branches]
 for version in versions:
-   html_context['versions'].append( (version, '/' +REPO_NAME+ '/'  +current_language+ '/' +version+ '/') )
+   if version == 'master':
+      version = 'stable'
+      html_context['versions'].append( (version, '/' +REPO_NAME+ '/'  +current_language+ '/' +version+ '/') )
  
 # POPULATE LINKS TO OTHER FORMATS/DOWNLOADS
  

@@ -2,12 +2,12 @@
 
 torlib is an open source Python utility package that can help in many scenarios :D
 
-[![Package Version](https://img.shields.io/pypi/v/chatterbot.svg)](https://pypi.python.org/pypi/torlib/)
+[![Package Version](https://img.shields.io/pypi/v/torlib.svg)](https://pypi.python.org/pypi/torlib/)
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
 
 
-## Installation
+# Installation
 
 This package can be installed from [PyPi](https://pypi.python.org/pypi/ChatterBot) by running:
 
@@ -15,7 +15,7 @@ This package can be installed from [PyPi](https://pypi.python.org/pypi/ChatterBo
 pip install torlib
 ```
 
-# [Documentation](https://noppadol-assava.github.io/torlib/)
+# Documentation
 
 You can view the [documentation](https://noppadol-assava.github.io/torlib/) for torlib.
 

@@ -70,6 +70,12 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
         log_file (str, optional): name of the log file showing the detail of fail case. Defaults to 'github_crawler_log.txt'.
         output_dir (str, optional): output directory. Defaults to ''.
         for_test (boolean, optional): used for testing or not. Defaults to False.
+
+    Raises:
+        LengthNotMatchError: Raised when the length of savename and url is not the same
+        InputNotStringError: Raised when not all of member in savename or url are string
+        NoTokenError: Raised when input list of github token is empty
+
     """
     # check the size of savename and url
     if len(savename) != len(url):

@@ -24,8 +24,9 @@ copyright = '2022, Noppadol Assavakamhaenghan'
 author = 'Noppadol Assavakamhaenghan'
 
 # The short X.Y version
-import torlib
-version = torlib.__version__
+# import torlib
+# version = torlib.__version__
+version = 'v0.0.4'
 # The full version, including alpha/beta/rc tags
 release = version
 
@@ -63,7 +64,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = 'en'
+language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

@@ -106,46 +106,46 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'helloWorlddoc'
+htmlhelp_basename = 'torlib'
 
 
 # -- Options for LaTeX output ------------------------------------------------
 
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
+# latex_elements = {
+#     # The paper size ('letterpaper' or 'a4paper').
+#     #
+#     # 'papersize': 'letterpaper',
 
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
+#     # The font size ('10pt', '11pt' or '12pt').
+#     #
+#     # 'pointsize': '10pt',
 
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
+#     # Additional stuff for the LaTeX preamble.
+#     #
+#     # 'preamble': '',
 
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
+#     # Latex figure (float) alignment
+#     #
+#     # 'figure_align': 'htbp',
+# }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'helloWorld.tex', 'helloWorld Documentation',
-     'Michael Altfield', 'manual'),
-]
+# latex_documents = [
+#     (master_doc, 'helloWorld.tex', 'helloWorld Documentation',
+#      'Michael Altfield', 'manual'),
+# ]
 
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'helloworld', 'helloWorld Documentation',
-     [author], 1)
-]
+# man_pages = [
+#     (master_doc, 'helloworld', 'helloWorld Documentation',
+#      [author], 1)
+# ]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -153,17 +153,17 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'helloWorld', 'helloWorld Documentation',
-     author, 'helloWorld', 'One line description of project.',
-     'Miscellaneous'),
-]
+# texinfo_documents = [
+#     (master_doc, 'helloWorld', 'helloWorld Documentation',
+#      author, 'helloWorld', 'One line description of project.',
+#      'Miscellaneous'),
+# ]
 
 
 # -- Options for Epub output -------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = project
+# epub_title = project
 
 # The unique identifier of the text. This can be a ISBN number
 # or the project homepage.
@@ -175,7 +175,7 @@ epub_title = project
 # epub_uid = ''
 
 # A list of files that should not be packed into the epub file.
-epub_exclude_files = ['search.html']
+# epub_exclude_files = ['search.html']
 
 
 # -- Extension configuration -------------------------------------------------
@@ -244,28 +244,28 @@ for version in versions:
 # POPULATE LINKS TO OTHER FORMATS/DOWNLOADS
  
 # settings for creating PDF with rinoh
-rinoh_documents = [(
- master_doc,
- 'target',
- project+ ' Documentation',
- '© ' +copyright,
-)]
-today_fmt = "%B %d, %Y"
+# rinoh_documents = [(
+#  master_doc,
+#  'target',
+#  project+ ' Documentation',
+#  '© ' +copyright,
+# )]
+# today_fmt = "%B %d, %Y"
  
-# settings for EPUB
-epub_basename = 'target'
+# # settings for EPUB
+# epub_basename = 'target'
  
-html_context['downloads'] = list()
-html_context['downloads'].append( ('pdf', '/' +REPO_NAME+ '/' +current_language+ '/' +current_version+ '/' +project+ '-docs_' +current_language+ '_' +current_version+ '.pdf') )
+# html_context['downloads'] = list()
+# html_context['downloads'].append( ('pdf', '/' +REPO_NAME+ '/' +current_language+ '/' +current_version+ '/' +project+ '-docs_' +current_language+ '_' +current_version+ '.pdf') )
  
-html_context['downloads'].append( ('epub', '/' +REPO_NAME+ '/' +current_language+ '/' +current_version+ '/' +project+ '-docs_' +current_language+ '_' +current_version+ '.epub') )
+# html_context['downloads'].append( ('epub', '/' +REPO_NAME+ '/' +current_language+ '/' +current_version+ '/' +project+ '-docs_' +current_language+ '_' +current_version+ '.epub') )
  
 ##########################
 # "EDIT ON GITHUB" LINKS #
 ##########################
  
 html_context['display_github'] = True
-html_context['github_user'] = 'maltfield'
-html_context['github_repo'] = 'rtd-github-pages'
+html_context['github_user'] = 'noppadol'
+html_context['github_repo'] = 'torlib'
 html_context['github_version'] = 'master/docs/'
  

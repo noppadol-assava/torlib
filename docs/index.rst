@@ -3,14 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to helloWorld's documentation!
+Welcome to torlib's documentation!
 ======================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   autodoc
+   crawler
 
 
 Indices and tables

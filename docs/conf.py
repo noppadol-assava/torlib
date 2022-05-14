@@ -240,8 +240,14 @@ html_context['languages'] = [ ('en', '/' +REPO_NAME+ '/en/' +current_version+ '/
  
 # POPULATE LINKS TO OTHER VERSIONS
 html_context['versions'] = list()
-exclude_branches = ['documentation_hugo_old', 'documentation_publish_hugo_old']
-versions = [branch.name for branch in repo.branches if branch.name not in exclude_branches]
+exclude_branches = set(['documentation_hugo_old', 'documentation_publish_hugo_old', 'HEAD', 'gh-pages'])
+remote_refs = repo.remote().refs
+versions = list()
+for ref in remote_refs:
+	ref = ref.name.split('/')[-1]
+	if ref not in exclude_branches:
+		versions.append( ref )
+# versions = [branch.name for branch in repo.branches if branch.name not in exclude_branches]
 for version in versions:
    if version == 'master':
       version = 'stable'

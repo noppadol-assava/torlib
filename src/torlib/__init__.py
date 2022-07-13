@@ -1,1 +1,4 @@
-__version__ = "0.0.4"
+from pbr.version import VersionInfo
+
+
+__version__ = VersionInfo('torlib').version_string()

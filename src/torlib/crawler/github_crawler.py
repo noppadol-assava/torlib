@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import responses
 
+
 class NoTokenError(Exception):
     """Raised when input list of github token is empty
 
@@ -58,7 +59,7 @@ class InputNotStringError(Exception):
         return f'{self.error_list_name} -> {self.message}'
 
 
-def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='github_crawler_log.txt', output_dir='', for_test=False):
+def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='github_crawler_log.txt', output_dir='', for_test=False, pretty_json=True):
     """ crawl the github api and save file to json this function will also generate the log file that show the url of api that cannot be crawled
 
     Args:
@@ -70,6 +71,7 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
         log_file (str, optional): name of the log file showing the detail of fail case. Defaults to 'github_crawler_log.txt'.
         output_dir (str, optional): output directory. Defaults to ''.
         for_test (boolean, optional): used for testing or not. Defaults to False.
+        pretty_json (boolean, optional): make to output json file easier to read. Defaults to True.
 
     Raises:
         LengthNotMatchError: Raised when the length of savename and url is not the same
@@ -99,7 +101,8 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
     save_path = [os.path.join(output_dir, f'{sn}.json') for sn in savename]
     list_to_crawl = list(zip(save_path, url))
     for i in range(len(list_to_crawl)):
-        list_to_crawl[i] = list_to_crawl[i]+(GHtoken[i % len(GHtoken)],)
+        list_to_crawl[i] = list_to_crawl[i] + \
+            (GHtoken[i % len(GHtoken)], pretty_json,)
     count_try = 0
     complete = False
     while count_try < retry and not complete:
@@ -124,9 +127,12 @@ def github_crawler_multipage(savename, url, GHtoken, retry=3, pc=1, log_file='gi
     fail_list = [(url, is_success)
                  for url, is_success in result if is_success != 1]
     with open(log_file, 'w') as outfile:
-        json.dump(fail_list, outfile)
+        if pretty_json:
+            json.dump(fail_list, outfile, indent=4)
+        else:
+            json.dump(fail_list, outfile)
 
-        
+
 def __collect_json_multipage(input_tuple):
     """ save response from request as json file
 
@@ -137,12 +143,14 @@ def __collect_json_multipage(input_tuple):
 
         - url of the api GHtoken (string) - Github Token
 
+        - pretty_json (boolean) - make to output json file easier to read
+
     Returns:
         tuple: (url, result) showing status of the crawling
         result will be 1 if sucess otherwise it will
         be the exception message of the error that occur
     """
-    save_path, url, GHtoken = input_tuple
+    save_path, url, GHtoken, pretty_json = input_tuple
     # if the file is exist proceed to next one
     if os.path.exists(save_path):
         return (url, 1)
@@ -175,7 +183,10 @@ def __collect_json_multipage(input_tuple):
                 stop_flag = True
         # save json file
         with open(save_path, 'w') as outfile:
-            json.dump(result_json, outfile)
+            if pretty_json:
+                json.dump(result_json, outfile, indent=4)
+            else:
+                json.dump(result_json, outfile)
     # return error
     except Exception as e:
         return (url, str(e))

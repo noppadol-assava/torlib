@@ -26,9 +26,9 @@ author = 'Noppadol Assavakamhaenghan'
 # The short X.Y version
 # import torlib
 # version = torlib.__version__
-version = 'v0.0.4'
+# version = 'v0.0.4'
 # The full version, including alpha/beta/rc tags
-release = version
+# release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -46,6 +46,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
+    'pbr.sphinxext',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

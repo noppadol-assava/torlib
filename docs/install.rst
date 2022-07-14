@@ -21,7 +21,7 @@ You can also install torlib directly from GitHub using ``pip``.
 
 .. code-block:: bash
 
-   pip install git+git://github.com/noppadol-assava/torlib.git@master
+   pip install git+https://github.com/noppadol-assava/torlib.git@master
 
 
 Installing from source

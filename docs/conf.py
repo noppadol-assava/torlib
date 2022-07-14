@@ -29,6 +29,9 @@ author = 'Noppadol Assavakamhaenghan'
 # version = 'v0.0.4'
 # The full version, including alpha/beta/rc tags
 # release = version
+from pbr.version import VersionInfo
+version = 'v'+VersionInfo('torlib').version_string()
+release = version
 
 
 # -- General configuration ---------------------------------------------------

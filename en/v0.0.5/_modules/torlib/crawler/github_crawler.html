@@ -1,0 +1,474 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>torlib.crawler.github_crawler &mdash; torlib v0.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+    <link rel="shortcut icon" href="../../../_static/icon.png"/>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> torlib
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v0.0.5
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../crawler.html">Crawler</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">torlib</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>torlib.crawler.github_crawler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for torlib.crawler.github_crawler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">responses</span>
+
+
+<span class="k">class</span> <span class="nc">NoTokenError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when input list of github token is empty</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        message (string): explanation of the error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;please input github token&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s1">&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">LengthNotMatchError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when the length of savename and url is not the same</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        savename (list): input list that cause error</span>
+<span class="sd">        url (list): input list that cause error</span>
+<span class="sd">        message (string): explanation of the error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">savename</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;savename and url must have same length&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_savename</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">savename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_url</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;len(savename)=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">length_savename</span><span class="si">}</span><span class="s1"> len(url)=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">length_url</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s1">&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">InputNotStringError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when not all of member in savename or url are string</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        error_list_name (string): name of input list that cause error</span>
+<span class="sd">        message (string): explanation of the error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_list_name</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;savename or url must contain only string&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_list_name</span> <span class="o">=</span> <span class="n">error_list_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">error_list_name</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="si">}</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="github_crawler_multipage"><a class="viewcode-back" href="../../../crawler.html#torlib.crawler.github_crawler.github_crawler_multipage">[docs]</a><span class="k">def</span> <span class="nf">github_crawler_multipage</span><span class="p">(</span><span class="n">savename</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">GHtoken</span><span class="p">,</span> <span class="n">retry</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">pc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="s1">&#39;github_crawler_log.txt&#39;</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">for_test</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pretty_json</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; crawl the github api and save file to json this function will also generate the log file that show the url of api that cannot be crawled</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        savename (list): contain string of the save file name (need to be same length as url)</span>
+<span class="sd">        url (list): contain string of url of the target api (need to be same length as savename)</span>
+<span class="sd">        GHtoken (list): list of github token</span>
+<span class="sd">        retry (int, optional): number of time to retry crawling the fail case. Defaults to 3.</span>
+<span class="sd">        pc (int, optional): number of process for multiprocessing. Defaults to 1.</span>
+<span class="sd">        log_file (str, optional): name of the log file showing the detail of fail case. Defaults to &#39;github_crawler_log.txt&#39;.</span>
+<span class="sd">        output_dir (str, optional): output directory. Defaults to &#39;&#39;.</span>
+<span class="sd">        for_test (boolean, optional): used for testing or not. Defaults to False.</span>
+<span class="sd">        pretty_json (boolean, optional): make to output json file easier to read. Defaults to True.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        LengthNotMatchError: Raised when the length of savename and url is not the same</span>
+<span class="sd">        InputNotStringError: Raised when not all of member in savename or url are string</span>
+<span class="sd">        NoTokenError: Raised when input list of github token is empty</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check the size of savename and url</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">savename</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">LengthNotMatchError</span><span class="p">(</span><span class="n">savename</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+    <span class="c1"># check type of member of savename and url</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">savename</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputNotStringError</span><span class="p">(</span><span class="s1">&#39;savename&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">url</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputNotStringError</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">)</span>
+    <span class="c1"># check if github token is empty</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">GHtoken</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NoTokenError</span><span class="p">()</span>
+    <span class="c1"># if savename and url length is 0 do nothing</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">savename</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="c1"># create path to output_dir if not exist</span>
+    <span class="n">Path</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># prepared parameter for collect_json_multipage</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sn</span><span class="si">}</span><span class="s1">.json&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">sn</span> <span class="ow">in</span> <span class="n">savename</span><span class="p">]</span>
+    <span class="n">list_to_crawl</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">list_to_crawl</span><span class="p">)):</span>
+        <span class="n">list_to_crawl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">list_to_crawl</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="p">(</span><span class="n">GHtoken</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">GHtoken</span><span class="p">)],</span> <span class="n">pretty_json</span><span class="p">,)</span>
+    <span class="n">count_try</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">complete</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">while</span> <span class="n">count_try</span> <span class="o">&lt;</span> <span class="n">retry</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">complete</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">count_try</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> attempt to crawl </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">list_to_crawl</span><span class="p">)</span><span class="si">}</span><span class="s1"> url&#39;</span><span class="p">)</span>
+        <span class="n">count_try</span> <span class="o">=</span> <span class="n">count_try</span><span class="o">+</span><span class="mi">1</span>
+        <span class="c1"># create pool for multiprocessing</span>
+        <span class="k">with</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">pc</span><span class="p">)</span> <span class="k">as</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">multi_out</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">imap</span><span class="p">(</span><span class="n">__collect_json_multipage</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">for_test</span> <span class="k">else</span> <span class="n">__collect_json_multipage_for_testing</span><span class="p">,</span>
+                                    <span class="n">list_to_crawl</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">list_to_crawl</span><span class="p">))</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">multi_out</span><span class="p">]</span>
+        <span class="c1"># check if all of url is complete and list only fail url</span>
+        <span class="n">complete</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">remain_list_to_crawl</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)):</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">is_success</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">is_success</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">complete</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">remain_list_to_crawl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_to_crawl</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">list_to_crawl</span> <span class="o">=</span> <span class="n">remain_list_to_crawl</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">list_to_crawl</span><span class="p">)</span>
+    <span class="c1"># list url that cannot be crawled</span>
+    <span class="n">fail_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">url</span><span class="p">,</span> <span class="n">is_success</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">is_success</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">is_success</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">log_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pretty_json</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">fail_list</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">fail_list</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">__collect_json_multipage</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; save response from request as json file</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_tuple (tuple): tuple contain three variables: </span>
+
+<span class="sd">        - save_path (string) save file name with path url (string) </span>
+
+<span class="sd">        - url of the api GHtoken (string) - Github Token</span>
+
+<span class="sd">        - pretty_json (boolean) - make to output json file easier to read</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (url, result) showing status of the crawling</span>
+<span class="sd">        result will be 1 if sucess otherwise it will</span>
+<span class="sd">        be the exception message of the error that occur</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">save_path</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">GHtoken</span><span class="p">,</span> <span class="n">pretty_json</span> <span class="o">=</span> <span class="n">input_tuple</span>
+    <span class="c1"># if the file is exist proceed to next one</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">page</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">stop_flag</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># track last page</span>
+    <span class="n">result_json</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">stop_flag</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">+</span><span class="s1">&#39;?per_page=100&amp;page=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">page</span><span class="p">),</span>
+                             <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;token &#39;</span><span class="o">+</span><span class="n">GHtoken</span><span class="p">})</span>
+            <span class="c1"># if ratelimit is not remain wait until rate limit reset and try again</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Remaining&#39;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">left_time</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Reset&#39;</span><span class="p">])</span>
+                <span class="k">while</span><span class="p">(</span><span class="n">left_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+                    <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="n">left_time</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> \
+                        <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;X-RateLimit-Reset&#39;</span><span class="p">])</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">+</span><span class="s1">&#39;?per_page=100&amp;page=&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">page</span><span class="p">),</span>
+                                 <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;token &#39;</span><span class="o">+</span><span class="n">GHtoken</span><span class="p">})</span>
+            <span class="n">json_r</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">json_r</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="n">result_json</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">json_r</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">result_json</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">json_r</span><span class="p">)</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">page</span><span class="o">+</span><span class="mi">1</span>
+            <span class="c1"># stop if last page</span>
+            <span class="k">if</span> <span class="s1">&#39;link&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span> <span class="ow">or</span> <span class="s1">&#39;rel=&quot;last&quot;&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;link&#39;</span><span class="p">]:</span>
+                <span class="n">stop_flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># save json file</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pretty_json</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result_json</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">result_json</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span>
+    <span class="c1"># return error</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="nd">@responses</span><span class="o">.</span><span class="n">activate</span>
+<span class="k">def</span> <span class="nf">__collect_json_multipage_for_testing</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; function used for testing only&quot;&quot;&quot;</span>
+    <span class="n">responses</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">responses</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span>
+                  <span class="s1">&#39;http://test_github/api/1?per_page=100&amp;page=1&#39;</span><span class="p">,</span>
+                  <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                  <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+                  <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;X-RateLimit-Remaining&#39;</span><span class="p">:</span> <span class="s1">&#39;100000&#39;</span><span class="p">},</span>
+                  <span class="n">body</span><span class="o">=</span><span class="s1">&#39;{&quot;test&quot;: &quot;test1&quot;}&#39;</span><span class="p">)</span>
+    <span class="n">responses</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">responses</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span>
+                  <span class="s1">&#39;http://test_github/api/2?per_page=100&amp;page=1&#39;</span><span class="p">,</span>
+                  <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                  <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+                  <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;X-RateLimit-Remaining&#39;</span><span class="p">:</span> <span class="s1">&#39;100000&#39;</span><span class="p">},</span>
+                  <span class="n">body</span><span class="o">=</span><span class="s1">&#39;{&quot;test&quot;: &quot;test2&quot;}&#39;</span><span class="p">)</span>
+    <span class="n">responses</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">responses</span><span class="o">.</span><span class="n">GET</span><span class="p">,</span>
+                  <span class="s1">&#39;http://test_github/api/3?per_page=100&amp;page=1&#39;</span><span class="p">,</span>
+                  <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                  <span class="n">content_type</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+                  <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;X-RateLimit-Remaining&#39;</span><span class="p">:</span> <span class="s1">&#39;100000&#39;</span><span class="p">},</span>
+                  <span class="n">body</span><span class="o">=</span><span class="s1">&#39;{&quot;test&quot;: &quot;test3&quot;}&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">__collect_json_multipage</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Noppadol Assavakamhaenghan.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Alternate Versions</span>
+      v: v0.0.5
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <!-- 
+      <dl>
+        <dt>Languages</dt>
+        
+           <strong> 
+          <dd><a href="/torlib/en/v0.0.5/">en</a></dd>
+           </strong> 
+        
+      </dl>
+       -->
+      
+      <dl>
+        <dt>Versions</dt>
+        
+          
+          <dd><a href="/torlib/en/master/">master</a></dd>
+          
+        
+          
+          <dd><a href="/torlib/en/v0.0.4/">v0.0.4</a></dd>
+          
+        
+           <strong> 
+          <dd><a href="/torlib/en/v0.0.5/">v0.0.5</a></dd>
+           </strong> 
+        
+      </dl>
+      
+      
+      <dl>
+        <dt>Downloads</dt>
+        
+          <dd><a href="/torlib/en/v0.0.5/torlib-docs_en_v0.0.5.pdf">pdf</a></dd>
+        
+          <dd><a href="/torlib/en/v0.0.5/torlib-docs_en_v0.0.5.epub">epub</a></dd>
+        
+      </dl>
+      
+      
+      <hr/>
+      Free document hosting provided by <a href="https://pages.github.com/">GitHub Pages</a>.
+ 
+    </div>
+  </div>
+
+ 
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
